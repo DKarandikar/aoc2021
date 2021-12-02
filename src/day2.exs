@@ -5,8 +5,8 @@ defmodule Day2 do
   end
 
   def acca(line, acc) do
-    [dir | val] = String.split(line, " ")
-    value = String.to_integer(val |> Enum.at(0))
+    [dir , val | _] = String.split(line, " ")
+    value = String.to_integer(val)
     case dir do
       "forward" -> {elem(acc, 0) + value, elem(acc, 1)}
       "down" -> {elem(acc, 0), elem(acc, 1) + value}
@@ -20,8 +20,8 @@ defmodule Day2 do
   end
 
   def accb(line, acc) do
-    [dir | val] = String.split(line, " ")
-    value = String.to_integer(val |> Enum.at(0))
+    [dir, val | _] = String.split(line, " ")
+    value = String.to_integer(val)
     case dir do
       "forward" -> {elem(acc, 0) + value, elem(acc, 1) + (value * elem(acc, 2)), elem(acc, 2)}
       "down" -> {elem(acc, 0), elem(acc, 1), elem(acc, 2) + value}
