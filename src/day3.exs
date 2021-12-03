@@ -30,10 +30,40 @@ defmodule Day3 do
 
   def solvePartB() do
     lines = Day3.getLines
-    lines |> hd
+
+    oxygen = Enum.reduce_while(0..Day3.size, lines, &Day3.accb/2)
+    co2 = Enum.reduce_while(0..Day3.size, lines, &Day3.accb2/2)
+
+    g = String.to_integer(oxygen, 2)
+    e = String.to_integer(co2, 2)
+    g * e
+  end
+
+  def accb(index, lines) do
+    most_common = Day3.get_most_common(index, lines)
+    new_lines = Enum.filter(lines, fn line -> String.at(line, index) == most_common end)
+
+    if length(new_lines) == 1, do: {:halt, Enum.at(new_lines, 0)}, else: {:cont, new_lines}
+  end
+
+  def accb2(index, lines) do
+    least_common = Day3.get_least_common(index, lines)
+    new_lines = Enum.filter(lines, fn line -> String.at(line, index) == least_common end)
+
+    if length(new_lines) == 1, do: {:halt, Enum.at(new_lines, 0)}, else: {:cont, new_lines}
+  end
+
+  def get_most_common(index, lines) do
+    v = Enum.map(lines, fn line -> if String.at(line, index) == "1", do: 1, else: 0 end)
+    if Enum.sum(v) >= length(lines) /2, do: "1", else: "0"
+  end
+
+  def get_least_common(index, lines) do
+    v = Enum.map(lines, fn line -> if String.at(line, index) == "1", do: 1, else: 0 end)
+    if Enum.sum(v) < length(lines) /2, do: "1", else: "0"
   end
 
 end
 
-IO.inspect(Day3.solvePartA())
-# IO.puts(Day3.solvePartB())
+# IO.inspect(Day3.solvePartA())
+IO.puts(Day3.solvePartB())
