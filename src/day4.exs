@@ -32,24 +32,37 @@ defmodule Day4 do
     File.read!("input/day4.txt") |> String.split("\n")
   end
 
-  def solvePartA() do
+  def getNumsBoards() do
     lines = Day4.getLines
     [nums | boards ] = lines
     boards = boards
       |> Enum.chunk_every(6)
       |> Enum.map(&Board.fromLines/1)
 
-    num_boards = length(boards) - 1
-
     boards = for i <- 0..length(boards) - 1, into: %{}, do: {i, Enum.at(boards, i)}
 
     nums = Enum.map(String.split(nums, ","), fn l -> String.to_integer(l) end)
 
+    {nums, boards}
+  end
+
+  def removeNumberFromBoards(boards, number) do
+    for i <- 0..Enum.max(Map.keys(boards)), Map.get(boards, i) != nil,
+      into: %{},
+      do: {
+        i,
+        Board.remove(Map.get(boards, i), number)
+      }
+  end
+
+  def solvePartA() do
+    {nums, boards} = Day4.getNumsBoards
+    num_boards = map_size(boards) - 1
+
     winner = Enum.reduce_while(0..length(nums), boards,  fn num_index, num_acc ->
+      boards = removeNumberFromBoards(num_acc, Enum.at(nums, num_index))
 
-      boards = for i <- 0..num_boards, into: %{}, do: {i, Board.remove(Map.get(num_acc, i), Enum.at(nums, num_index))}
-
-      winner = Enum.reduce_while( 0.. num_boards, nil, fn i, acc ->
+      winner = Enum.reduce_while(0.. num_boards, nil, fn i, _ ->
         board = Map.get(boards, i)
         if Board.is_winner?(board), do:
           {:halt, board}, else:
@@ -69,23 +82,10 @@ defmodule Day4 do
   end
 
   def solvePartB() do
-    lines = Day4.getLines
-    [nums | boards ] = lines
-    boards = boards
-      |> Enum.chunk_every(6)
-      |> Enum.map(&Board.fromLines/1)
+    {nums, boards} = Day4.getNumsBoards
 
-    num_boards = length(boards) - 1
-
-    boards = for i <- 0..length(boards) - 1, into: %{}, do: {i, Enum.at(boards, i)}
-
-    nums = Enum.map(String.split(nums, ","), fn l -> String.to_integer(l) end)
-
-    winner = Enum.reduce_while(0..length(nums), boards,  fn num_index, num_acc ->
-
-      # num_boards = map_size(num_acc) - 1
-
-      boards = for i <- 0..num_boards, Map.get(num_acc, i) != nil, into: %{}, do: {i, Board.remove(Map.get(num_acc, i), Enum.at(nums, num_index))}
+    result = Enum.reduce_while(0..length(nums), boards,  fn num_index, num_acc ->
+      boards = removeNumberFromBoards(num_acc, Enum.at(nums, num_index))
 
       new_boards = :maps.filter fn _, v -> Board.is_winner?(v) == :false end, boards
 
@@ -96,12 +96,9 @@ defmodule Day4 do
     end
     )
 
-    last_board = winner |> elem(0)
-    last_num = winner |> elem(1)
+    last_num = result |> elem(1)
+    Board.score(Board.remove(result |> elem(0), last_num)) * last_num
 
-
-
-    Board.score(Board.remove(last_board, last_num)) * last_num
   end
 
 end
