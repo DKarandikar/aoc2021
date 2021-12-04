@@ -70,10 +70,41 @@ defmodule Day4 do
 
   def solvePartB() do
     lines = Day4.getLines
-    lines |> hd
+    [nums | boards ] = lines
+    boards = boards
+      |> Enum.chunk_every(6)
+      |> Enum.map(&Board.fromLines/1)
+
+    num_boards = length(boards) - 1
+
+    boards = for i <- 0..length(boards) - 1, into: %{}, do: {i, Enum.at(boards, i)}
+
+    nums = Enum.map(String.split(nums, ","), fn l -> String.to_integer(l) end)
+
+    winner = Enum.reduce_while(0..length(nums), boards,  fn num_index, num_acc ->
+
+      # num_boards = map_size(num_acc) - 1
+
+      boards = for i <- 0..num_boards, Map.get(num_acc, i) != nil, into: %{}, do: {i, Board.remove(Map.get(num_acc, i), Enum.at(nums, num_index))}
+
+      new_boards = :maps.filter fn _, v -> Board.is_winner?(v) == :false end, boards
+
+      if map_size(new_boards) != 1, do:
+        {:cont, new_boards}, else:
+        {:halt, {Map.get(new_boards, Enum.random(Map.keys(new_boards))), Enum.at(nums, num_index + 1)}}
+
+    end
+    )
+
+    last_board = winner |> elem(0)
+    last_num = winner |> elem(1)
+
+
+
+    Board.score(Board.remove(last_board, last_num)) * last_num
   end
 
 end
 
-IO.inspect(Day4.solvePartA())
-# IO.puts(Day4.solvePartB())
+IO.puts(Day4.solvePartA())
+IO.puts(Day4.solvePartB())
