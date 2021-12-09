@@ -70,7 +70,7 @@ defmodule Day9 do
   end
 
   def explorePos(array, {x, y}) do
-    Enum.reduce_while(0..1000000000, {[{x, y}], MapSet.new()}, fn _, {sofar, done} ->
+    Enum.reduce_while(Stream.cycle([0]), {[{x, y}], MapSet.new()}, fn _, {sofar, done} ->
 
       if length(sofar) == 0, do: {:halt, done}, else: (
 
