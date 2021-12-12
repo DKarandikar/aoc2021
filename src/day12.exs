@@ -14,10 +14,8 @@ defmodule Day12 do
 
   def upcase?(x), do: x == String.upcase(x)
 
-  def getPaths() do
+  def getPaths(special_cave) do
     graph = getGraph()
-
-
 
     Enum.reduce_while(Stream.cycle([0]), {[["start"]], []}, fn _, {paths, comp} ->
       if length(paths) == 0, do: {:halt, comp}, else: (
@@ -29,7 +27,7 @@ defmodule Day12 do
             {ps, cs ++ [path ++ [neighbour]]}
           ), else: (
 
-            if upcase?(neighbour) || not Enum.member?(path, neighbour), do: (
+            if upcase?(neighbour) || not Enum.member?(path, neighbour) || (special_cave == neighbour && Enum.count(path, &(&1 == neighbour)) == 1), do: (
               {ps ++ [path ++ [neighbour]], cs}
             ), else: (
               {ps, cs}
@@ -44,15 +42,19 @@ defmodule Day12 do
   end
 
   def solvePartA() do
-    getPaths() |> length
+    getPaths(nil) |> length
   end
 
   def solvePartB() do
-    lines = Day12.getLines
-    lines |> hd
+    Enum.reduce(Map.keys(getGraph()), MapSet.new(), fn cave, set ->
+      if not upcase?(cave) && cave != "start" && cave != "end", do: (
+        MapSet.union(set, MapSet.new(getPaths(cave)))
+      ), else: set
+    end)
+      |> MapSet.size()
   end
 
 end
 
 IO.inspect(Day12.solvePartA())
-# IO.puts(Day12.solvePartB())
+IO.puts(Day12.solvePartB())
