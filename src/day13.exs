@@ -40,11 +40,26 @@ defmodule Day13 do
   end
 
   def solvePartB() do
-    lines = Day13.getLines
-    lines |> hd
+    Enum.reduce(getFolds(), getDots(), fn fold, dots ->
+      doFold(dots, fold)
+    end)
+      |> printDots()
+    nil
+  end
+
+  def printDots(dots) do
+    xs = dots |> Enum.map(&(elem(&1, 0)))
+    ys = dots |> Enum.map(&(elem(&1, 1)))
+
+    maxX = xs |> Enum.max()
+    maxY = ys |> Enum.max()
+
+    Enum.map(0..maxY, fn y ->
+      IO.puts(Enum.map(0..maxX, fn x -> if MapSet.member?(dots, {x, y}), do: "#", else: "-" end))
+    end)
   end
 
 end
 
 IO.inspect(Day13.solvePartA())
-# IO.puts(Day13.solvePartB())
+IO.inspect(Day13.solvePartB())
