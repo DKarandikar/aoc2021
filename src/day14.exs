@@ -60,7 +60,39 @@ defmodule Day14 do
   def solvePartA(), do: runSimulation(10)
   def solvePartB(), do: runSimulation(40)
 
+  defmodule Benchmark do
+    def measure(function) do
+      function
+      |> :timer.tc
+      |> elem(0)
+      |> Kernel./(1_000_000)
+    end
+  end
+
+  @doc
+  """
+  Example run:
+  {10, 0.004278}
+  {100, 0.045966}
+  {500, 0.225122}
+  {1000, 0.47288}
+  {1500, 0.724123}
+  {2000, 0.967095}
+  {3000, 1.441607}
+  {4000, 1.945051}
+  {5000, 2.497075}
+  {10000, 4.855638}
+  {20000, 10.830172}
+  {50000, 34.69945}
+  {100000, 91.930433}
+  """
+  def benchmark() do
+    Enum.map([10, 100, 500, 1000, 1500, 2000, 3000, 4000, 5000, 10000, 20000, 50000, 100000], fn i -> IO.inspect({i, Benchmark.measure(fn -> runSimulation(i) end)}) end)
+  end
+
 end
 
 IO.puts(Day14.solvePartA())
 IO.puts(Day14.solvePartB())
+
+# Day14.benchmark()
