@@ -8,13 +8,12 @@ defmodule Day15 do
 
   def getLoc(data, x, y), do: data |> Enum.at(y) |> Enum.at(x)
 
-  def getMap(costs, x, y), do: Map.get(costs, {x, y}, 1000)
+  def getMap(costs, x, y), do: Map.get(costs, {x, y}, 10000)
 
-  def iterativeSolve() do
+  def iterativeSolve(data) do
     big = 10000
-    data = getLines()
 
-    res = Enum.reduce(0..20, %{{0, 0} => 0}, fn _, acc ->
+    res = Enum.reduce(0..10, %{{0, 0} => 0}, fn _, acc ->
       Enum.reduce(0 .. length(data) - 1, acc, fn y, acc2 ->
         Enum.reduce(0 .. length(Enum.at(data, y)) - 1, acc2, fn x, costs ->
           if (x == 0 && y == 0), do: costs, else: (
@@ -34,15 +33,33 @@ defmodule Day15 do
   end
 
   def solvePartA() do
-    iterativeSolve()
+    iterativeSolve(getLines())
+  end
+
+  def genDataPart2() do
+    data = getLines()
+    Enum.reduce(0 .. 4, [], fn i, acc ->
+      Enum.reduce(0 .. length(data) - 1, acc, fn y, acc2 ->
+        acc2 ++ [expandLine(i, Enum.at(data, y))]
+      end)
+    end)
+  end
+
+  def expandLine(cost, line) do
+    Enum.reduce(0 .. 4, [], fn i, acc ->
+      Enum.reduce(0 .. length(line) -1, acc, fn x, acc2 ->
+        val = Enum.at(line, x) + cost + i
+        val = if val > 9, do: val - 9, else: val
+        acc2 ++ [val]
+      end)
+    end)
   end
 
   def solvePartB() do
-    lines = Day15.getLines
-    lines |> hd
+    iterativeSolve(genDataPart2())
   end
 
 end
 
 IO.inspect(Day15.solvePartA())
-# IO.puts(Day15.solvePartB())
+IO.inspect(Day15.solvePartB())
