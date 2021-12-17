@@ -60,10 +60,21 @@ defmodule Day17 do
   end
 
   def solvePartB() do
-    1
+    {xrange, yrange} = getFiringBounds()
+
+    Enum.reduce(xrange, MapSet.new(), fn x, acc ->
+      Enum.reduce(yrange, acc, fn y, acc2 ->
+        case evaluateStart(x, y) do
+          nil -> acc2
+          _ -> MapSet.put(acc2, {x, y})
+        end
+      end)
+    end)
+      |> MapSet.size()
+
   end
 
 end
 
 IO.inspect(Day17.solvePartA())
-# IO.puts(Day17.solvePartB())
+IO.inspect(Day17.solvePartB())
