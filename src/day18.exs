@@ -103,10 +103,18 @@ defmodule Day18 do
 
   def solvePartB() do
     lines = Day18.getLines
-    lines |> hd
+    Enum.reduce(lines, 0, fn line, acc ->
+
+      Enum.reduce(lines, acc, fn line2, acc2 ->
+        if line == line2, do: acc2, else: (
+          tot = add(parseLine(line), parseLine(line2)) |> reduce() |> magnitude()
+          if tot > acc2, do: tot, else: acc2
+        )
+      end)
+    end)
   end
 
 end
 
-IO.inspect(Day18.solvePartA())
-# IO.puts(Day18.solvePartB())
+IO.puts(Day18.solvePartA())
+IO.puts(Day18.solvePartB())
